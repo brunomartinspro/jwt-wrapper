@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/JwtWrapper/.vs/JwtWrapper/v15
+/JwtWrapper/JwtWrapper/obj/Release
+/JwtWrapper/JwtWrapper/obj/Debug
+/JwtWrapper/JwtWrapper.DTO/bin
+/JwtWrapper/JwtWrapper.DTO/obj
+/JwtWrapper/JwtWrapper/obj
+/JwtWrapper/JwtWrapper.Interface/bin
+/JwtWrapper/JwtWrapper.Interface/obj
+/JwtWrapper/JwtWrapper.Test/bin
+/JwtWrapper/JwtWrapper.Test/obj
+/JwtWrapper/JwtWrapper/bin
+/JwtWrapper/.vs/JwtWrapper/DesignTimeBuild
