@@ -37,36 +37,53 @@ namespace JwtWrapper
         /// <param name="secretToken"></param>
         /// <param name="objectToEncode"></param>
         /// <returns></returns>
-        public OutputDto<string> Encode(string secretToken, object objectToEncode, DateTime? tokenExpireDate = null)
+        public OutputDto<string> Encode(string secretToken, object objectToEncode, DateTime? tokenExpireDate = null, IJwtAlgorithm algorithm = null)
         {
             try
             {
                 //Add 1 hour of token expiration by default
                 DateTimeOffset expireDate = DateTimeOffset.UtcNow.AddHours(1);
 
-                //Parse Datetime
+                //Add default algorithm
+                if (algorithm == null)
+                {
+                    algorithm = new HMACSHA256Algorithm();
+                }
+
+                //Encode token
+                var tokenBuilder = new JwtBuilder()
+                                    .WithAlgorithm(algorithm)
+                                    .WithSecret(secretToken)
+                                    .AddClaim("content", objectToEncode);
+
+                //Validate expire date
                 if (tokenExpireDate.HasValue)
                 {
                     //Parse date to UTC
                     expireDate = tokenExpireDate.Value.Kind != DateTimeKind.Utc ? tokenExpireDate.Value.ToUniversalTime() : tokenExpireDate.Value;
+
+                    tokenBuilder = tokenBuilder.AddClaim("exp", expireDate.ToUnixTimeSeconds());
                 }
 
-                //Encode token
-                var token = new JwtBuilder()
-                              .WithAlgorithm(new HMACSHA256Algorithm())
-                              .WithSecret(secretToken)
-                              .AddClaim("exp", expireDate.ToUnixTimeSeconds())
-                              .AddClaim("content", objectToEncode)
-                              .Build();
+                //Build token
+                var token = tokenBuilder.Build();
 
                 //Validate token
                 if (string.IsNullOrWhiteSpace(token))
                 {
                     return new OutputDto<string>(HttpStatusCode.Unauthorized, "The generated token is empty", null);
                 }
+                
+                if (tokenExpireDate.HasValue)
+                {
+                    //Return converted Object
+                    return new OutputDto<string>(token, HttpStatusCode.OK, ToUtc(expireDate.DateTime));
+                }
+                else
+                {
+                    return new OutputDto<string>(token);
+                }
 
-                //Return token
-                return new OutputDto<string>(token, HttpStatusCode.OK, ToUtc(expireDate.DateTime));
             }
             catch (Exception ex)
             {
@@ -88,10 +105,18 @@ namespace JwtWrapper
                 string decodedToken = _jwtDecoder.Decode(token, secretToken, verify: true);
 
                 //Decode Token
-                DecodeToken(decodedToken, out string content, out DateTime parsedDateTime);
+                DecodeToken(decodedToken, out string content, out DateTime? parsedDateTime);
 
-                //Return converted Object
-                return new OutputDto<string>(content, HttpStatusCode.OK, ToUtc(parsedDateTime));
+                if (parsedDateTime.HasValue)
+                {
+                    //Return converted Object
+                    return new OutputDto<string>(content, HttpStatusCode.OK, ToUtc(parsedDateTime.Value));
+                }
+                else
+                {
+                    return new OutputDto<string>(content);
+                }
+               
             }
             catch (TokenExpiredException ex)
             {
@@ -117,13 +142,20 @@ namespace JwtWrapper
                 string decodedToken = _jwtDecoder.Decode(token, secretToken, verify: true);
 
                 //Decode Token
-                DecodeToken(decodedToken, out string content, out DateTime parsedDateTime);
+                DecodeToken(decodedToken, out string content, out DateTime? parsedDateTime);
 
                 //convert json to object
                 var convertedObject = JsonConvert.DeserializeObject<T>(content);
-
-                //Return converted Object
-                return new OutputDto<T>(convertedObject, HttpStatusCode.OK, ToUtc(parsedDateTime));
+                
+                if (parsedDateTime.HasValue)
+                {
+                    //Return converted Object
+                    return new OutputDto<T>(convertedObject, HttpStatusCode.OK, ToUtc(parsedDateTime.Value));
+                }
+                else
+                {
+                    return new OutputDto<T>(convertedObject);
+                }
             }
             catch (TokenExpiredException ex)
             {
@@ -151,19 +183,23 @@ namespace JwtWrapper
         /// <param name="decodedToken"></param>
         /// <param name="content"></param>
         /// <param name="parseDateTime"></param>
-        private void DecodeToken(string decodedToken, out string content, out DateTime parseDateTime)
+        private void DecodeToken(string decodedToken, out string content, out DateTime? parseDateTime)
         {
             //Get content
             var decodedObject = JsonConvert.DeserializeObject<Dictionary<string, object>>(decodedToken);
-            
+
+            parseDateTime = null;
+
             //Get Expire date as long
-            var expireDate = long.Parse(decodedObject["exp"].ToString());
+            if (decodedObject.ContainsKey("exp") && long.TryParse(decodedObject["exp"]?.ToString(), out long expireDate))
+            {
+                //Convert expire date
+                parseDateTime = DateTimeOffset.FromUnixTimeSeconds(expireDate).DateTime;
+            }
+          
 
             //Get content
             content = decodedObject["content"].ToString();
-
-            //Convert expire date
-            parseDateTime = DateTimeOffset.FromUnixTimeSeconds(expireDate).DateTime;
         }
     }
 }

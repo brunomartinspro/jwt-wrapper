@@ -16,6 +16,20 @@ namespace JwtWrapper.DTO.Output
         /// Create Output
         /// </summary>
         /// <param name="content"></param>
+        public OutputDto(T content)
+        {
+            Content = content;
+            Status = new StatusDto
+            {
+                Message = HttpStatusCode.OK.ToString(),
+                Code = HttpStatusCode.OK
+            };
+        }
+
+        /// <summary>
+        /// Create Output
+        /// </summary>
+        /// <param name="content"></param>
         /// <param name="httpStatusCode"></param>
         public OutputDto(T content, HttpStatusCode httpStatusCode, string expireDate)
         {

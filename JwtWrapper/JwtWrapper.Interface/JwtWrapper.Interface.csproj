@@ -1,18 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.1.0</Version>
     <Authors>BrunoMartins.Pro</Authors>
-    <Company>N/A</Company>
+    <Company />
+    <Product>JwtWrapper</Product>
     <Description>This is a JWT Wrapper of the framework jwt-dotnet/jwt (github.com/jwt-dotnet/jwt) for ASP.Net Core.</Description>
     <Copyright>MIT</Copyright>
     <PackageLicenseUrl>https://github.com/brunomartinspro/jwt-wrapper/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/brunomartinspro/jwt-wrapper</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>jwt, wrapper, token</PackageTags>
-    <PackageReleaseNotes>All implementations based of  jwt-dotnet/jwt belong to jwt-dotnet/jwt.</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JWT" Version="5.1.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\JwtWrapper.DTO\JwtWrapper.DTO.csproj" />

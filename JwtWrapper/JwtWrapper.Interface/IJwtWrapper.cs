@@ -1,4 +1,5 @@
-﻿using JwtWrapper.DTO.Output;
+﻿using JWT.Algorithms;
+using JwtWrapper.DTO.Output;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +15,7 @@ namespace JwtWrapper.Interface
         /// <param name="objectToEncode"></param>
         /// <param name="tokenExpireDate"></param>
         /// <returns></returns>
-        OutputDto<string> Encode(string secretToken, object objectToEncode, DateTime? tokenExpireDate = null);
+        OutputDto<string> Encode(string secretToken, object objectToEncode, DateTime? tokenExpireDate = null, IJwtAlgorithm algorithm = null);
 
         /// <summary>
         /// Decode object with secret
