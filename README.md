@@ -26,7 +26,7 @@ var tokenOutput = jwtWrapper.Encode(secret, objectToEncode);
 var decodeOutput = jwtWrapper.Decode<StatusDto>(secret, tokenOutput?.Content);
 ```
 
-### Encoding object with default expiration date of one hour
+### Encoding object with no expiration date
 
 ```csharp
 // Encode object
