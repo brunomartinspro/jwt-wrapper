@@ -46,7 +46,7 @@ var tokenOutput = jwtWrapper.Encode(secret, objectToEncode, tomorrow);
 ### Encoding object with custom algorithm
 
 ```csharp
-//Create algorithm
+//Create algorithm, also the default if no algorithm is passed
 IJwtAlgorithm algorithm = new HMACSHA256Algorithm();
 
 // Encode object
