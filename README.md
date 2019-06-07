@@ -43,6 +43,19 @@ DateTime tomorrow = DateTime.Now.AddDays(1);
 var tokenOutput = jwtWrapper.Encode(secret, objectToEncode, tomorrow);
 ```
 
+### Encoding object with custom algorithm
+
+```csharp
+//Set the token expiration day to tomorrow
+DateTime tomorrow = DateTime.Now.AddDays(1);
+
+//Create algorithm
+var algorithm = new HMACSHA256Algorithm();
+
+// Encode object
+var tokenOutput = jwtWrapper.Encode(secret, objectToEncode, tomorrow, algorithm);
+```
+
 ### Decoding token with json output
 
 ```csharp
